@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>CAMERA / GLB Studio</title>
+        <link rel="stylesheet" href="style.css" />
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <div class="app">
+            <header class="top">
+                <div class="brand">◈ <b>CAMERA</b> STUDIO</div>
+                <button id="editorMode" class="active">編集ビュー</button>
+                <button id="cameraMode">カメラビュー</button>
+                <button id="themeToggle" aria-label="ライトモードに切り替え">
+                    ☀ ライト
+                </button>
+                <button id="load">GLBを読み込む</button>
+                <input id="file" class="file" type="file" accept=".glb,.gltf" />
+                <button id="save">設定を保存</button>
+                <button id="open">設定を開く</button>
+                <input id="jsonfile" class="file" type="file" accept=".json" />
+                <span class="spacer"></span>
+                <button id="export">PNGを書き出す</button>
+            </header>
+            <aside class="side">
+                <h3>カメラ投影</h3>
+                <select id="projection" class="full">
+                    <option value="perspective">透視投影</option>
+                    <option value="orthographic">正投影（平行投影）</option>
+                    <option value="fisheye">魚眼（広角近似）</option>
+                </select>
+                <div class="row">
+                    <span>焦点距離</span
+                    ><input
+                        id="lens"
+                        type="range"
+                        min="8"
+                        max="200"
+                        value="50"
+                    /><input
+                        id="lensN"
+                        type="number"
+                        min="8"
+                        max="200"
+                        value="50"
+                    />
+                </div>
+                <div class="row">
+                    <span>センサー幅</span
+                    ><input
+                        id="sensor"
+                        type="range"
+                        min="18"
+                        max="70"
+                        value="36"
+                    /><input
+                        id="sensorN"
+                        type="number"
+                        min="18"
+                        max="70"
+                        value="36"
+                    />
+                </div>
+                <div class="row" id="orthoRow">
+                    <span>正投影スケール</span
+                    ><input
+                        id="scale"
+                        type="range"
+                        min="1"
+                        max="80"
+                        value="12"
+                    /><input
+                        id="scaleN"
+                        type="number"
+                        min="1"
+                        max="80"
+                        value="12"
+                    />
+                </div>
+                <div class="row">
+                    <span>魚眼画角</span
+                    ><input
+                        id="fov"
+                        type="range"
+                        min="90"
+                        max="180"
+                        value="150"
+                    /><input
+                        id="fovN"
+                        type="number"
+                        min="90"
+                        max="180"
+                        value="150"
+                    />
+                </div>
+                <div class="note">
+                    焦点距離とセンサー幅から画角を算出。魚眼は広角透視の近似表示です。
+                </div>
+                <h3>レンズの定番プリセット</h3>
+                <div class="presetRow">
+                    <button type="button" data-lens="24">24mm</button>
+                    <button type="button" data-lens="35">35mm</button>
+                    <button type="button" data-lens="50">50mm</button>
+                    <button type="button" data-lens="55">55mm</button>
+                    <button type="button" data-lens="85">85mm</button>
+                </div>
+                <div class="note">
+                    編集ビューでは黄色いレンズ点をドラッグして画角を調整できます。
+                </div>
+                <h3>カメラ位置</h3>
+                <div class="row">
+                    <span>X</span
+                    ><input
+                        id="x"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="8"
+                    /><input id="xN" type="number" step=".1" value="8" />
+                </div>
+                <div class="row">
+                    <span>Y</span
+                    ><input
+                        id="y"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="6"
+                    /><input id="yN" type="number" step=".1" value="6" />
+                </div>
+                <div class="row">
+                    <span>Z</span
+                    ><input
+                        id="z"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="10"
+                    /><input id="zN" type="number" step=".1" value="10" />
+                </div>
+                <div class="row">
+                    <span>注視点 X</span
+                    ><input
+                        id="tx"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="0"
+                    /><input id="txN" type="number" step=".1" value="0" />
+                </div>
+                <div class="row">
+                    <span>注視点 Y</span
+                    ><input
+                        id="ty"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="0"
+                    /><input id="tyN" type="number" step=".1" value="0" />
+                </div>
+                <div class="row">
+                    <span>注視点 Z</span
+                    ><input
+                        id="tz"
+                        type="range"
+                        min="-30"
+                        max="30"
+                        step=".1"
+                        value="0"
+                    /><input id="tzN" type="number" step=".1" value="0" />
+                </div>
+                <h3>カメラアングルプリセット</h3>
+                <div class="presetRow anglePresets">
+                    <button type="button" data-angle="eye">目線</button>
+                    <button type="button" data-angle="high">俯瞰</button>
+                    <button type="button" data-angle="low">アオリ</button>
+                    <button type="button" data-angle="top">真上</button>
+                </div>
+                <div class="note">
+                    カメラの位置・向きを変更します。編集ビュー（前／上／横）はそのまま維持します。
+                </div>
+                <div class="sep"></div>
+                <h3>編集ビュー（カメラとは別視点）</h3>
+                <div class="note">
+                    前・上・横は編集用の視点を切り替えます。カメラ位置や向きは変わりません。
+                </div>
+                <div class="views">
+                    <button class="viewbtn" data-view="front">前</button>
+                    <button class="viewbtn" data-view="top">上</button>
+                    <button class="viewbtn" data-view="side">横</button>
+                    <button class="viewbtn" data-view="3d">3D</button>
+                </div>
+                <label class="check"
+                    ><input type="checkbox" id="grid" checked />
+                    グリッドを表示</label
+                >
+                <label class="check"
+                    ><input type="checkbox" id="backfaceCull" checked />
+                    背面を隠す（裏面カリング）</label
+                ><label class="check"
+                    ><input type="checkbox" id="bg" checked />
+                    背景を表示（OFFで透過）</label
+                >
+                <div class="row">
+                    <span>背景色</span
+                    ><input
+                        id="color"
+                        type="color"
+                        value="#111a20"
+                        style="grid-column: span 2; width: 100%; height: 32px"
+                    />
+                </div>
+                <div class="sep"></div>
+                <div class="note">
+                    前・上・横では背景をドラッグするとパンだけ、右ドラッグもパン、ホイールでズーム。前・上・横ではミント色の点をドラッグして位置、オレンジ色の点をドラッグして向き、黄色の画角ハンドルをドラッグして焦点距離を変更します。カメラビューで結果を確認。Cmd/Ctrl+Zで元に戻す、Cmd/Ctrl+Shift+Zでやり直し。iPadは2本指タップで元に戻す、3本指タップでやり直し。
+                </div>
+            </aside>
+            <main class="stage" id="stage">
+                <canvas id="view"></canvas>
+                <div class="drop" id="drop">GLBファイルをここにドロップ</div>
+                <div class="handleLegend">
+                    カメラ操作：<b class="mint">● 位置</b>　<b class="orange"
+                        >● 注視点</b
+                    >　<b class="yellow">● 画角</b>
+                </div>
+                <div class="hud" id="hud">
+                    GLBを読み込んでください　·　ドラッグでカメラ操作
+                </div>
+            </main>
+        </div>
+
+        <script type="module" src="app.js"></script>
+    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4e47b98de40006e',t:'MTc5MjYyOTk2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
