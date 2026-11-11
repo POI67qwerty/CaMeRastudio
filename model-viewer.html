@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f5f6f2" />
+    <title>モデルビューアー | Room Sketch Studio</title>
+  </head>
+  <body>
+    <div id="model-app">
+      <!-- 部屋画面への戻るリンク -->
+      <header class="header">
+        <div class="brand">
+          <div class="logo">◈</div>
+          <div>
+            <strong>Model Sketch Viewer</strong>
+            <small>ROOM SKETCH STUDIO · MODEL VIEW</small>
+          </div>
+        </div>
+        <a class="back" id="backToRoom" href="./index.html">
+          ← Room Sketch Studioに戻る
+        </a>
+      </header>
+      <div class="layout">
+        <!-- モデルの3Dプレビュー -->
+        <main class="main">
+          <div class="heading">
+            <div>
+              <span class="eyebrow">YOUR MODEL, YOUR VIEW</span>
+              <h1>モデルを眺める</h1>
+              <p>好きな角度を見つけて、作画の参考に。</p>
+            </div>
+            <div class="modes" aria-label="表示モード">
+              <button class="active" data-mode="color">カラー</button>
+              <button data-mode="binary">二値線画</button>
+            </div>
+          </div>
+          <div class="stage" id="stage">
+            <canvas id="view"></canvas>
+            <canvas id="guideOverlay"></canvas>
+            <div class="stage-info">3D MODEL PREVIEW</div>
+            <div class="empty" id="empty">
+              <span class="symbol">◇</span>
+              <strong>モデルを読み込んでみましょう</strong>
+              <span>右のボタンから選択、またはここにGLBをドロップ</span>
+            </div>
+          </div>
+          <div class="stage-footer">
+            <span>
+              左ドラッグ：回転　右ドラッグ：移動　ホイール：拡大・縮小
+            </span>
+            <span id="status" class="status" aria-live="polite">準備完了</span>
+          </div>
+        </main>
+        <!-- 読み込み・カメラ・ガイド・書き出しの設定 -->
+        <aside class="sidebar">
+          <section class="section">
+            <div class="title">
+              <h2>モデル</h2>
+              <span>MODEL</span>
+            </div>
+            <span class="filename" id="filename">まだ読み込まれていません</span>
+            <input
+              type="file"
+              id="modelFile"
+              accept=".glb,model/gltf-binary"
+              hidden
+            />
+            <button class="btn primary wide" id="openModel">
+              ＋ GLBを読み込む
+            </button>
+            <p class="hint">
+              外部ファイルを参照しない単一GLB、50MB以下。モデルはブラウザ内で処理します。
+            </p>
+          </section>
+          <section class="section">
+            <div class="title">
+              <h2>カメラ</h2>
+              <span>CAMERA</span>
+            </div>
+            <div class="buttons">
+              <button class="btn" id="resetView">全体に合わせる</button>
+              <button class="btn" id="frontView">正面を見る</button>
+            </div>
+            <div class="range-heading">
+              <label for="fov">レンズ画角</label>
+              <output id="fovOut">45°</output>
+            </div>
+            <input id="fov" type="range" min="20" max="90" value="45" />
+            <label class="check">
+              背面を描画しない
+              <input type="checkbox" id="culling" checked />
+            </label>
+          </section>
+          <section class="section">
+            <div class="title">
+              <h2>作画ガイド</h2>
+              <span>DRAWING GUIDES</span>
+            </div>
+            <label class="check">
+              アイレベル
+              <input type="checkbox" id="horizon" />
+            </label>
+            <label class="check">
+              消失点と補助線
+              <input type="checkbox" id="guides" />
+            </label>
+            <div class="range-heading">
+              <label for="guideCount">補助線の本数（各軸）</label>
+              <output id="guideOut">24本</output>
+            </div>
+            <div class="countrow">
+              <input
+                id="guideCount"
+                type="range"
+                min="2"
+                max="200"
+                value="24"
+              />
+              <input
+                id="guideCountNumber"
+                class="number"
+                type="number"
+                min="2"
+                max="200"
+                value="24"
+                aria-label="補助線の本数"
+              />
+            </div>
+            <span class="label">表示する軸</span>
+            <div class="axes">
+              <label>
+                <input type="checkbox" id="axisX" checked />
+                <i class="dot x"></i>
+                VP1
+              </label>
+              <label>
+                <input type="checkbox" id="axisZ" checked />
+                <i class="dot z"></i>
+                VP2
+              </label>
+              <label>
+                <input type="checkbox" id="axisY" checked />
+                <i class="dot y"></i>
+                垂直
+              </label>
+            </div>
+            <div class="range-heading">
+              <label for="guideOpacity">補助線の濃さ</label>
+              <output id="opacityOut">35%</output>
+            </div>
+            <input
+              id="guideOpacity"
+              type="range"
+              min="5"
+              max="100"
+              value="35"
+            />
+            <div class="range-heading">
+              <label for="guideWidth">補助線の太さ</label>
+              <output id="guideWidthOut">0.75 px</output>
+            </div>
+            <input
+              id="guideWidth"
+              type="range"
+              min="0.25"
+              max="3"
+              step="0.25"
+              value="0.75"
+            />
+            <label class="check">
+              地面のグリッド
+              <input type="checkbox" id="guideGrid" />
+            </label>
+            <div class="gridcols" id="gridSettings" hidden>
+              <label class="label">
+                マスの大きさ（m）
+                <input
+                  class="number"
+                  type="number"
+                  id="gridStep"
+                  min="0.1"
+                  max="10"
+                  step="0.1"
+                  value="0.5"
+                />
+              </label>
+              <label class="label">
+                マスの数（片側）
+                <input
+                  class="number"
+                  type="number"
+                  id="gridCount"
+                  min="1"
+                  max="60"
+                  step="1"
+                  value="20"
+                />
+              </label>
+            </div>
+            <p class="hint">
+              現在のカメラに合わせた直線透視のガイドです。5点・6点透視には未対応です。
+            </p>
+          </section>
+          <section class="section" id="binarySettings" hidden>
+            <div class="title">
+              <h2>二値線画</h2>
+              <span>LINE SETTINGS</span>
+            </div>
+            <div class="range-heading">
+              <label for="lineWidth">線の太さ</label>
+              <output id="lineWidthOut">1.0 px</output>
+            </div>
+            <input
+              id="lineWidth"
+              type="range"
+              min="0.5"
+              max="5"
+              step="0.1"
+              value="1"
+            />
+            <div class="range-heading">
+              <label for="depthSensitivity">奥行きの境目</label>
+              <output id="depthOut">標準</output>
+            </div>
+            <input
+              id="depthSensitivity"
+              type="range"
+              min="1"
+              max="100"
+              value="50"
+            />
+            <div class="range-heading">
+              <label for="normalSensitivity">面の向きの境目</label>
+              <output id="normalOut">標準</output>
+            </div>
+            <input
+              id="normalSensitivity"
+              type="range"
+              min="1"
+              max="100"
+              value="50"
+            />
+            <label class="check">
+              物体の境目を描く
+              <input type="checkbox" id="idEdges" checked />
+            </label>
+            <p class="hint">
+              黒と白の2色。細い形状、透明やテクスチャ等は忠実に線にならない場合があります。
+            </p>
+          </section>
+          <section class="section">
+            <div class="title">
+              <h2>画像を書き出す</h2>
+              <span>EXPORT</span>
+            </div>
+            <label class="check">
+              表示中のガイドを画像に含める
+              <input type="checkbox" id="exportGuides" />
+            </label>
+            <div class="buttons">
+              <button class="btn primary" id="download">PNGを保存</button>
+              <button class="btn" id="copy">画像をコピー</button>
+            </div>
+            <p class="hint">
+              プレビューと同じ構図・解像度で出力します。ガイドを含めると二値線画も2色だけではなくなります。
+            </p>
+          </section>
+        </aside>
+      </div>
+      <div class="toast" id="toast" role="status"></div>
+    </div>
+    <script type="module" src="/src/model-viewer.js"></script>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+/* controls — モデルビューアー */
+.range-heading {
+  display: flex;
+  justify-content: space-between;
+  color: #718476;
+  font-size: 11px;
+  margin: 13px 0 6px;
+}
+.range-heading output {
+  color: #96a89a;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: #789a7e;
+  height: 4px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: #5e7564;
+  margin: 11px 0;
+}
+.check input,
+.axes input {
+  accent-color: #668c70;
+}
+.axes {
+  display: flex;
+  gap: 10px;
+  font-size: 10px;
+  color: #718679;
+}
+.axes label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.x {
+  background: #cc6e67;
+}
+.z {
+  background: #509b8b;
+}
+.y {
+  background: #6985c1;
+}
+.gridcols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.countrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.countrow input[type="range"] {
+  flex: 1;
+}
+.countrow .number {
+  width: 61px;
+}

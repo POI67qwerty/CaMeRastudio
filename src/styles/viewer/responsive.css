@@ -1,0 +1,35 @@
+/* responsive — モデルビューアー */
+@media (max-width: 800px) {
+  .header {
+    padding: 0 16px;
+  }
+  .layout {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .main {
+    padding: 18px 15px;
+  }
+  .stage {
+    height: 58vh;
+    flex: none;
+  }
+  .sidebar {
+    border: 0;
+    border-top: 1px solid #e5ebe3;
+    padding: 20px;
+  }
+  .heading h1 {
+    font-size: 17px;
+  }
+  .modes button {
+    padding: 8px 11px;
+  }
+  .stage-footer {
+    line-height: 1.6;
+  }
+  .back {
+    font-size: 10px;
+  }
+}

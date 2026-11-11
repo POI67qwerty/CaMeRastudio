@@ -1,0 +1,53 @@
+/* perspective-guides — 部屋エディター */
+.guide-count-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.guide-count-row input[type="range"] {
+  flex: 1;
+  min-width: 0;
+}
+.guide-count-row input[type="number"] {
+  width: 62px;
+  border: 1px solid #dce6db;
+  background: white;
+  border-radius: 6px;
+  padding: 6px;
+  font-size: 11px;
+  color: #405447;
+  text-align: center;
+}
+.axis-checks {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.axis-checks label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: #748379;
+}
+.axis-checks input {
+  accent-color: #66886d;
+  margin: 0;
+}
+.axis-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.axis-x {
+  background: #cc6e67;
+}
+.axis-z {
+  background: #509b8b;
+}
+.axis-y {
+  background: #6985c1;
+}
+#gridSettings[hidden] {
+  display: none;
+}

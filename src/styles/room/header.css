@@ -1,0 +1,77 @@
+/* header — 部屋エディター */
+.topbar {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid #e8ebe6;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 23px;
+  gap: 20px;
+}
+.brand {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  min-width: 240px;
+}
+.logo {
+  width: 33px;
+  height: 33px;
+  background: #293e36;
+  border-radius: 10px;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+.brand b {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.brand small {
+  display: block;
+  color: #99a19b;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  margin-top: 1px;
+}
+.topmid {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #7d8980;
+  font-size: 12px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  background: #9dbda6;
+  border-radius: 50%;
+}
+.topactions {
+  display: flex;
+  gap: 8px;
+}
+.button {
+  border: 1px solid #e1e6df;
+  background: #fff;
+  color: #4c5b51;
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.button:hover {
+  border-color: #99b5a2;
+  background: #f5f9f5;
+}
+.button.primary {
+  background: #314c3d;
+  border-color: #314c3d;
+  color: white;
+}
+.button.primary:hover {
+  background: #42614f;
+}

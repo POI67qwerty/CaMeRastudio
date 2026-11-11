@@ -1,0 +1,96 @@
+/* sidebar — モデルビューアー */
+.sidebar {
+  background: white;
+  border-left: 1px solid #e5ebe3;
+  overflow-y: auto;
+  padding: 23px 23px 30px;
+}
+.section {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #edf1eb;
+}
+.section:last-child {
+  border: 0;
+}
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 13px;
+}
+.title h2 {
+  font-size: 13px;
+  margin: 0;
+  color: #304438;
+}
+.title span {
+  font-size: 9px;
+  letter-spacing: 0.09em;
+  color: #a0afa2;
+}
+.filename {
+  display: block;
+  padding: 10px 11px;
+  background: #f6f8f4;
+  border: 1px solid #e7eee5;
+  border-radius: 7px;
+  color: #6b7e70;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 9px;
+}
+.btn {
+  border: 1px solid #dfe9df;
+  background: white;
+  color: #4c6855;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-weight: 650;
+  font-size: 11px;
+}
+.btn:hover {
+  background: #f2f8f1;
+  border-color: #a9c2ab;
+}
+.btn.primary {
+  background: #345641;
+  color: #fff;
+  border-color: #345641;
+}
+.btn.primary:hover {
+  background: #426a4e;
+}
+.wide {
+  width: 100%;
+}
+.buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.hint {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #9aa99c;
+  margin: 8px 0 0;
+}
+.label {
+  display: block;
+  color: #728677;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 11px 0 6px;
+}
+.select,
+.number {
+  width: 100%;
+  border: 1px solid #e0e8dd;
+  border-radius: 7px;
+  color: #526a58;
+  background: #fafcf9;
+  padding: 8px;
+  font-size: 11px;
+}

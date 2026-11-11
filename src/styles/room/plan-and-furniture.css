@@ -1,0 +1,80 @@
+/* plan-and-furniture — 部屋エディター */
+.plan-wrap {
+  border: 1px solid #e5eae3;
+  background: #f7f9f5;
+  border-radius: 9px;
+  padding: 8px;
+  position: relative;
+}
+.plan-wrap canvas {
+  width: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+.plan-head {
+  display: flex;
+  justify-content: space-between;
+  color: #8a978b;
+  font-size: 10px;
+  margin-bottom: 5px;
+}
+.plan-hint {
+  margin: 9px 0 0;
+  font-size: 10px;
+  color: #9ba79d;
+  line-height: 1.7;
+}
+.legend {
+  display: flex;
+  gap: 14px;
+  margin-top: 9px;
+  font-size: 10px;
+  color: #94a097;
+}
+.swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  margin-right: 5px;
+  background: #98b29d;
+}
+.swatch.wall {
+  background: #455a4b;
+}
+.itemgrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+}
+.item {
+  border: 1px solid #e8ede7;
+  background: #fbfcfa;
+  border-radius: 8px;
+  height: 65px;
+  color: #516158;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+.item:hover {
+  background: #eef5ee;
+  border-color: #acc5b0;
+}
+.item .ico {
+  font-size: 19px;
+  line-height: 1;
+}
+.tip {
+  background: #f5f8f4;
+  border: 1px solid #edf2eb;
+  border-radius: 8px;
+  padding: 10px 11px;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #819084;
+}

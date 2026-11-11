@@ -1,0 +1,63 @@
+/* responsive — 部屋エディター */
+@media (max-width: 1050px) {
+  .shell {
+    grid-template-columns: 230px minmax(320px, 1fr) 235px;
+  }
+  .sidebar {
+    padding: 18px 13px;
+  }
+  .brand {
+    min-width: 190px;
+  }
+  .topmid {
+    display: none;
+  }
+}
+@media (max-width: 760px) {
+  body {
+    overflow: auto;
+  }
+  .topbar {
+    padding: 0 12px;
+  }
+  .brand {
+    min-width: 0;
+  }
+  .brand small {
+    display: none;
+  }
+  .shell {
+    height: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .workspace {
+    order: 0;
+    height: 65vh;
+    min-height: 450px;
+  }
+  .left {
+    order: 1;
+  }
+  .right {
+    order: 2;
+  }
+  .sidebar {
+    border: 0;
+  }
+  .topactions .secondary {
+    display: none;
+  }
+  .itemgrid {
+    grid-template-columns: repeat(6, 1fr);
+  }
+  .plan-wrap {
+    max-width: 400px;
+  }
+  .topbar .button {
+    padding: 8px;
+  }
+  .view-bottom {
+    font-size: 9px;
+  }
+}

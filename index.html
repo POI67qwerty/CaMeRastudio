@@ -1,249 +1,715 @@
 <!doctype html>
 <html lang="ja">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>CAMERA / GLB Studio</title>
-        <link rel="stylesheet" href="style.css" />
-        <script type="importmap">
-            {
-                "imports": {
-                    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-                }
-            }
-        </script>
-    </head>
-    <body>
-        <div class="app">
-            <header class="top">
-                <div class="brand">◈ <b>CAMERA</b> STUDIO</div>
-                <button id="editorMode" class="active">編集ビュー</button>
-                <button id="cameraMode">カメラビュー</button>
-                <button id="themeToggle" aria-label="ライトモードに切り替え">
-                    ☀ ライト
-                </button>
-                <button id="load">GLBを読み込む</button>
-                <input id="file" class="file" type="file" accept=".glb,.gltf" />
-                <button id="save">設定を保存</button>
-                <button id="open">設定を開く</button>
-                <input id="jsonfile" class="file" type="file" accept=".json" />
-                <span class="spacer"></span>
-                <button id="export">PNGを書き出す</button>
-            </header>
-            <aside class="side">
-                <h3>カメラ投影</h3>
-                <select id="projection" class="full">
-                    <option value="perspective">透視投影</option>
-                    <option value="orthographic">正投影（平行投影）</option>
-                    <option value="fisheye">魚眼（広角近似）</option>
-                </select>
-                <div class="row">
-                    <span>焦点距離</span
-                    ><input
-                        id="lens"
-                        type="range"
-                        min="8"
-                        max="200"
-                        value="50"
-                    /><input
-                        id="lensN"
-                        type="number"
-                        min="8"
-                        max="200"
-                        value="50"
-                    />
-                </div>
-                <div class="row">
-                    <span>センサー幅</span
-                    ><input
-                        id="sensor"
-                        type="range"
-                        min="18"
-                        max="70"
-                        value="36"
-                    /><input
-                        id="sensorN"
-                        type="number"
-                        min="18"
-                        max="70"
-                        value="36"
-                    />
-                </div>
-                <div class="row" id="orthoRow">
-                    <span>正投影スケール</span
-                    ><input
-                        id="scale"
-                        type="range"
-                        min="1"
-                        max="80"
-                        value="12"
-                    /><input
-                        id="scaleN"
-                        type="number"
-                        min="1"
-                        max="80"
-                        value="12"
-                    />
-                </div>
-                <div class="row">
-                    <span>魚眼画角</span
-                    ><input
-                        id="fov"
-                        type="range"
-                        min="90"
-                        max="180"
-                        value="150"
-                    /><input
-                        id="fovN"
-                        type="number"
-                        min="90"
-                        max="180"
-                        value="150"
-                    />
-                </div>
-                <div class="note">
-                    焦点距離とセンサー幅から画角を算出。魚眼は広角透視の近似表示です。
-                </div>
-                <h3>レンズの定番プリセット</h3>
-                <div class="presetRow">
-                    <button type="button" data-lens="24">24mm</button>
-                    <button type="button" data-lens="35">35mm</button>
-                    <button type="button" data-lens="50">50mm</button>
-                    <button type="button" data-lens="55">55mm</button>
-                    <button type="button" data-lens="85">85mm</button>
-                </div>
-                <div class="note">
-                    編集ビューでは黄色いレンズ点をドラッグして画角を調整できます。
-                </div>
-                <h3>カメラ位置</h3>
-                <div class="row">
-                    <span>X</span
-                    ><input
-                        id="x"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="8"
-                    /><input id="xN" type="number" step=".1" value="8" />
-                </div>
-                <div class="row">
-                    <span>Y</span
-                    ><input
-                        id="y"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="6"
-                    /><input id="yN" type="number" step=".1" value="6" />
-                </div>
-                <div class="row">
-                    <span>Z</span
-                    ><input
-                        id="z"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="10"
-                    /><input id="zN" type="number" step=".1" value="10" />
-                </div>
-                <div class="row">
-                    <span>注視点 X</span
-                    ><input
-                        id="tx"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="0"
-                    /><input id="txN" type="number" step=".1" value="0" />
-                </div>
-                <div class="row">
-                    <span>注視点 Y</span
-                    ><input
-                        id="ty"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="0"
-                    /><input id="tyN" type="number" step=".1" value="0" />
-                </div>
-                <div class="row">
-                    <span>注視点 Z</span
-                    ><input
-                        id="tz"
-                        type="range"
-                        min="-30"
-                        max="30"
-                        step=".1"
-                        value="0"
-                    /><input id="tzN" type="number" step=".1" value="0" />
-                </div>
-                <h3>カメラアングルプリセット</h3>
-                <div class="presetRow anglePresets">
-                    <button type="button" data-angle="eye">目線</button>
-                    <button type="button" data-angle="high">俯瞰</button>
-                    <button type="button" data-angle="low">アオリ</button>
-                    <button type="button" data-angle="top">真上</button>
-                </div>
-                <div class="note">
-                    カメラの位置・向きを変更します。編集ビュー（前／上／横）はそのまま維持します。
-                </div>
-                <div class="sep"></div>
-                <h3>編集ビュー（カメラとは別視点）</h3>
-                <div class="note">
-                    前・上・横は編集用の視点を切り替えます。カメラ位置や向きは変わりません。
-                </div>
-                <div class="views">
-                    <button class="viewbtn" data-view="front">前</button>
-                    <button class="viewbtn" data-view="top">上</button>
-                    <button class="viewbtn" data-view="side">横</button>
-                    <button class="viewbtn" data-view="3d">3D</button>
-                </div>
-                <label class="check"
-                    ><input type="checkbox" id="grid" checked />
-                    グリッドを表示</label
-                >
-                <label class="check"
-                    ><input type="checkbox" id="backfaceCull" checked />
-                    背面を隠す（裏面カリング）</label
-                ><label class="check"
-                    ><input type="checkbox" id="bg" checked />
-                    背景を表示（OFFで透過）</label
-                >
-                <div class="row">
-                    <span>背景色</span
-                    ><input
-                        id="color"
-                        type="color"
-                        value="#111a20"
-                        style="grid-column: span 2; width: 100%; height: 32px"
-                    />
-                </div>
-                <div class="sep"></div>
-                <div class="note">
-                    前・上・横では背景をドラッグするとパンだけ、右ドラッグもパン、ホイールでズーム。前・上・横ではミント色の点をドラッグして位置、オレンジ色の点をドラッグして向き、黄色の画角ハンドルをドラッグして焦点距離を変更します。カメラビューで結果を確認。Cmd/Ctrl+Zで元に戻す、Cmd/Ctrl+Shift+Zでやり直し。iPadは2本指タップで元に戻す、3本指タップでやり直し。
-                </div>
-            </aside>
-            <main class="stage" id="stage">
-                <canvas id="view"></canvas>
-                <div class="drop" id="drop">GLBファイルをここにドロップ</div>
-                <div class="handleLegend">
-                    カメラ操作：<b class="mint">● 位置</b>　<b class="orange"
-                        >● 注視点</b
-                    >　<b class="yellow">● 画角</b>
-                </div>
-                <div class="hud" id="hud">
-                    GLBを読み込んでください　·　ドラッグでカメラ操作
-                </div>
-            </main>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Room Sketch Studio</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- 上部：保存・読込・画面切替 -->
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo">⌂</div>
+          <div>
+            <b>Room Sketch Studio</b>
+            <small>3D BACKGROUND WORKSPACE</small>
+          </div>
         </div>
-
-        <script type="module" src="app.js"></script>
-    <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a4e47b98de40006e',t:'MTc5MjYyOTk2Mw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+        <div class="topmid">
+          <span class="dot"></span>
+          あなたのアイデアを、空間に。
+        </div>
+        <div class="topactions">
+          <button
+            class="button secondary viewer-link"
+            id="openViewer"
+            aria-controls="viewerPanel"
+          >
+            ◇ モデル専用ビュー
+          </button>
+          <button class="button secondary" id="undo" title="元に戻す (Ctrl+Z)">
+            ↶
+          </button>
+          <button class="button secondary" id="redo" title="やり直す (Ctrl+Y)">
+            ↷
+          </button>
+          <button class="button secondary" id="save">↓ 保存</button>
+          <button class="button secondary" id="load">↑ 読込</button>
+          <button class="button primary" id="exportOpen">↗ 書き出す</button>
+        </div>
+      </header>
+      <div class="shell">
+        <!-- 左：部屋、間取り、家具 -->
+        <aside class="sidebar left">
+          <div class="section">
+            <div class="section-title">
+              <h2>部屋をつくる</h2>
+              <span>ROOM SETUP</span>
+            </div>
+            <label class="label">部屋のテンプレート</label>
+            <select class="select" id="room">
+              <option value="bedroom">自室 / ベッドルーム</option>
+              <option value="living">リビング</option>
+              <option value="classroom">教室</option>
+              <option value="washitsu">和室 / 畳</option>
+              <option value="empty">空の部屋</option>
+            </select>
+            <div id="tatamiSettings" class="tatami-settings" hidden>
+              <label class="label" for="tatamiPattern">畳の敷き方</label>
+              <select class="select" id="tatamiPattern">
+                <option value="8">8畳の敷き方</option>
+                <option value="6">6畳の敷き方（横）</option>
+                <option value="6-vertical">6畳の敷き方（縦）</option>
+                <option value="4.5">4.5畳の敷き方</option>
+              </select>
+              <p class="muted">
+                畳は約0.9×1.8m。現在の床に模様を繰り返します。端は切れる場合があります。
+              </p>
+            </div>
+            <div class="row" style="margin-top: 8px">
+              <button class="button primary" id="random">
+                🎲 部屋を作り直す
+              </button>
+            </div>
+            <div class="seedrow">
+              <label>
+                SEED
+                <input
+                  id="seed"
+                  type="number"
+                  value="1042"
+                  min="0"
+                  max="999999999"
+                />
+              </label>
+              <button class="button" id="seedRoll" title="seedを変える">
+                ↻
+              </button>
+              <button class="button" id="seedBuild">種から作成</button>
+            </div>
+            <div class="row">
+              <button class="button" id="rerollOpenings">🎲 開口だけ</button>
+              <button class="button" id="rerollPlacement">🎲 配置だけ</button>
+            </div>
+            <p class="muted">
+              同じ種・種類・部屋の大きさなら同じ部屋になります。部屋ガチャは全体を作り直します。
+            </p>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>間取り</h2>
+              <span>FLOOR PLAN</span>
+            </div>
+            <div class="plan-tools">
+              <button class="active" data-tool="select">選択</button>
+              <button data-tool="floor">床を塗る</button>
+              <button data-tool="outside">外にする</button>
+              <button data-tool="wall">壁→窓→扉</button>
+              <button data-tool="opening">窓・扉を選ぶ</button>
+            </div>
+            <div class="plan-wrap">
+              <div class="plan-head">
+                <span>TOP VIEW</span>
+                <span id="roomSize">8 × 7m</span>
+              </div>
+              <canvas id="plan" width="420" height="420"></canvas>
+            </div>
+            <div class="legend">
+              <span>
+                <i class="swatch"></i>
+                家具
+              </span>
+              <span>
+                <i class="swatch wall"></i>
+                壁
+              </span>
+              <span>
+                <i class="swatch warning"></i>
+                配置の警告
+              </span>
+            </div>
+            <div
+              id="collisionSummary"
+              class="collision-summary"
+              aria-live="polite"
+            >
+              配置に問題はありません
+            </div>
+            <p class="plan-hint">
+              外周の壁をドラッグして部屋の大きさを変更（1m単位）
+              <br />
+              床を塗る／外にする／壁の辺をクリックで切替
+              <br />
+              窓・扉を選んで寸法を調整
+              <br />
+              <span class="kbd">R</span>
+              90°　
+              <span class="kbd">Shift + R</span>
+              15°　
+              <span class="kbd">Esc</span>
+              配置終了
+            </p>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>家具を追加</h2>
+              <span>ADD OBJECT</span>
+            </div>
+            <div class="itemgrid">
+              <button class="item" data-add="desk">
+                <span class="ico">▤</span>
+                机
+              </button>
+              <button class="item" data-add="chair">
+                <span class="ico">♧</span>
+                椅子
+              </button>
+              <button class="item" data-add="bed">
+                <span class="ico">▰</span>
+                ベッド
+              </button>
+              <button class="item" data-add="shelf">
+                <span class="ico">▥</span>
+                本棚
+              </button>
+              <button class="item" data-add="sofa">
+                <span class="ico">▱</span>
+                ソファ
+              </button>
+              <button class="item" data-add="plant">
+                <span class="ico">♧</span>
+                観葉植物
+              </button>
+              <button class="item" data-add="fan">
+                <span class="ico">◉</span>
+                扇風機
+              </button>
+              <button class="item" data-add="lowtable">
+                <span class="ico">▱</span>
+                ちゃぶ台
+              </button>
+              <button class="item" data-add="zabuton">
+                <span class="ico">▣</span>
+                座布団
+              </button>
+              <button class="item" data-add="futon">
+                <span class="ico">▰</span>
+                布団
+              </button>
+              <button class="item" data-add="shoji">
+                <span class="ico">▥</span>
+                障子
+              </button>
+            </div>
+            <details class="primitive-editor">
+              <summary>＋ 基本形を作る（プリミティブ）</summary>
+              <div class="primitive-content">
+                <label class="label">形</label>
+                <select class="select" id="primitiveType">
+                  <option value="box">箱</option>
+                  <option value="cylinder">円柱</option>
+                  <option value="sphere">球</option>
+                </select>
+                <div class="primitive-dims">
+                  <label>
+                    幅 m
+                    <input
+                      type="number"
+                      id="primW"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      value="1"
+                    />
+                  </label>
+                  <label>
+                    高さ m
+                    <input
+                      type="number"
+                      id="primH"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      value="1"
+                    />
+                  </label>
+                  <label>
+                    奥行 m
+                    <input
+                      type="number"
+                      id="primD"
+                      min="0.1"
+                      max="10"
+                      step="0.1"
+                      value="1"
+                    />
+                  </label>
+                </div>
+                <div class="primitive-actions">
+                  <label>
+                    色
+                    <input type="color" id="primColor" value="#c6b79f" />
+                  </label>
+                  <button class="button primary" id="makePrimitive">
+                    作って配置
+                  </button>
+                </div>
+                <p class="muted">
+                  寸法を決めて作成し、床をクリック。部品として複製・保存できます。
+                </p>
+              </div>
+            </details>
+            <div class="import-row">
+              <label>
+                読み込み倍率
+                <input
+                  id="importScale"
+                  type="number"
+                  min="0.01"
+                  max="100"
+                  step="0.1"
+                  value="1"
+                  aria-label="モデルの読み込み倍率"
+                />
+              </label>
+              <button class="button" id="import">＋ 自分のモデル</button>
+            </div>
+            <p class="muted">
+              GLB（単一ファイル・50MB以下）。大きすぎて入らないモデルは読み込み倍率を小さくしてください。
+            </p>
+            <p class="muted">
+              家具を選び、間取りまたは3Dの床をクリックして連続配置。Escで終了。
+            </p>
+          </div>
+          <div class="tip">
+            ✳ &nbsp; 間取り図で家具を動かしながら、右側で見え方を調整できます。
+          </div>
+        </aside>
+        <!-- 中央：3Dプレビュー -->
+        <main class="workspace">
+          <div class="workspace-head">
+            <div>
+              <h1>
+                3D プレビュー
+                <span class="badge">ROOM</span>
+              </h1>
+              <p>空間を見ながら、構図を決めましょう</p>
+            </div>
+            <div class="segments mode-segments">
+              <button data-mode="color" class="active">カラー</button>
+              <button data-mode="line">辺の線画</button>
+              <button data-mode="binary">二値線画</button>
+            </div>
+          </div>
+          <div class="viewport-outer">
+            <div class="viewport" id="viewport">
+              <canvas id="view"></canvas>
+              <canvas class="overlay" id="overlay"></canvas>
+              <div class="view-label">
+                <b>●</b>
+                &nbsp;PERSPECTIVE VIEW
+              </div>
+              <div class="viewtools">
+                <button id="resetCamera" title="カメラをリセット">⌂</button>
+                <button id="zoomIn" title="ズームイン">＋</button>
+                <button id="zoomOut" title="ズームアウト">−</button>
+              </div>
+            </div>
+            <div class="view-bottom">
+              <span>
+                <strong>操作</strong>
+                &nbsp;空白ドラッグ：回転　家具ドラッグ：移動　右ドラッグ：平行移動
+              </span>
+              <span id="status">準備完了</span>
+            </div>
+          </div>
+        </main>
+        <!-- 右：カメラ、ガイド、寸法、線画 -->
+        <aside class="sidebar right">
+          <div class="section">
+            <div class="section-title">
+              <h2>表示設定</h2>
+              <span>VIEW SETTINGS</span>
+            </div>
+            <label class="label">カメラのプリセット</label>
+            <select class="select" id="camera">
+              <option value="overview">俯瞰 / 部屋全体</option>
+              <option value="eye">アイレベル</option>
+              <option value="front">正面 / 1点透視</option>
+              <option value="two">斜め / 2点透視</option>
+              <option value="three">見上げ / 3点透視</option>
+              <option value="top">真上 / 間取り</option>
+            </select>
+            <div class="field">
+              <div class="fieldtop">
+                <span>レンズ画角</span>
+                <output id="fovOut">45°</output>
+              </div>
+              <input id="fov" type="range" min="20" max="90" value="45" />
+            </div>
+            <label class="check">
+              手前の壁を隠す
+              <input type="checkbox" id="hideWalls" checked />
+            </label>
+            <label class="check">
+              背面を描画しない
+              <input type="checkbox" id="culling" checked />
+            </label>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>作画ガイド</h2>
+              <span>DRAWING GUIDES</span>
+            </div>
+            <label class="check">
+              アイレベル
+              <input type="checkbox" id="horizon" />
+            </label>
+            <label class="check">
+              消失点と補助線
+              <input type="checkbox" id="guides" />
+            </label>
+            <div class="field">
+              <div class="fieldtop">
+                <span>補助線の本数（各軸）</span>
+                <output id="guideOut">24本</output>
+              </div>
+              <div class="guide-count-row">
+                <input
+                  id="guideCount"
+                  type="range"
+                  min="2"
+                  max="200"
+                  value="24"
+                />
+                <input
+                  id="guideCountNumber"
+                  type="number"
+                  min="2"
+                  max="200"
+                  step="1"
+                  value="24"
+                  aria-label="補助線の本数"
+                />
+              </div>
+            </div>
+            <label class="label" style="margin-top: 14px">表示する軸</label>
+            <div class="axis-checks">
+              <label>
+                <input type="checkbox" id="guideAxisX" checked />
+                <span class="axis-dot axis-x"></span>
+                VP1
+              </label>
+              <label>
+                <input type="checkbox" id="guideAxisZ" checked />
+                <span class="axis-dot axis-z"></span>
+                VP2
+              </label>
+              <label>
+                <input type="checkbox" id="guideAxisY" checked />
+                <span class="axis-dot axis-y"></span>
+                垂直
+              </label>
+            </div>
+            <div class="field">
+              <div class="fieldtop">
+                <span>補助線の濃さ</span>
+                <output id="guideOpacityOut">35%</output>
+              </div>
+              <input
+                id="guideOpacity"
+                type="range"
+                min="5"
+                max="100"
+                value="35"
+              />
+            </div>
+            <div class="field">
+              <div class="fieldtop">
+                <span>補助線の太さ</span>
+                <output id="guideWidthOut">0.75 px</output>
+              </div>
+              <input
+                id="guideWidth"
+                type="range"
+                min="0.25"
+                max="3"
+                step="0.25"
+                value="0.75"
+              />
+            </div>
+            <label class="check">
+              地面のグリッド
+              <input type="checkbox" id="guideGrid" />
+            </label>
+            <div id="gridSettings" class="dimension-grid" hidden>
+              <label>
+                マスの大きさ（m）
+                <input
+                  type="number"
+                  id="gridStep"
+                  min="0.1"
+                  max="10"
+                  step="0.1"
+                  value="0.5"
+                />
+              </label>
+              <label>
+                マスの数（片側）
+                <input
+                  type="number"
+                  id="gridCount"
+                  min="1"
+                  max="60"
+                  step="1"
+                  value="20"
+                />
+              </label>
+            </div>
+            <p class="muted">
+              補助線はプレビューに重ねて表示します。通常のPNGには含まれません。5点・6点透視は未対応です。
+            </p>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>選択中のオブジェクト</h2>
+              <span>SELECTION</span>
+            </div>
+            <div class="selection">
+              <div id="selectedName">間取りまたは3D上で選択</div>
+              <div id="selectedWarning" class="selected-warning" hidden></div>
+              <div class="row">
+                <button class="button" id="rotate">↻ 90°</button>
+                <button class="button" id="rotateFine">↻ 15°</button>
+                <button class="button" id="duplicate">複製</button>
+                <button class="button" id="remove">削除</button>
+              </div>
+              <div id="deskEditor" class="dimension-editor" hidden>
+                <div class="dimension-title">
+                  机の寸法
+                  <span>m</span>
+                </div>
+                <div class="dimension-grid">
+                  <label>
+                    幅
+                    <input
+                      type="number"
+                      id="deskWidth"
+                      min="0.3"
+                      max="4"
+                      step="0.05"
+                    />
+                  </label>
+                  <label>
+                    奥行
+                    <input
+                      type="number"
+                      id="deskDepth"
+                      min="0.3"
+                      max="3"
+                      step="0.05"
+                    />
+                  </label>
+                  <label>
+                    天板の厚さ
+                    <input
+                      type="number"
+                      id="deskThickness"
+                      min="0.02"
+                      max="0.3"
+                      step="0.01"
+                    />
+                  </label>
+                  <label>
+                    脚の長さ
+                    <input
+                      type="number"
+                      id="deskLeg"
+                      min="0.2"
+                      max="2"
+                      step="0.05"
+                    />
+                  </label>
+                </div>
+                <button class="button" id="applyDesk">机に反映</button>
+                <p class="dimension-hint">選択中の机だけが変わります。</p>
+              </div>
+              <div id="modelEditor" class="dimension-editor" hidden>
+                <div class="dimension-title">
+                  読み込んだモデル
+                  <span id="modelFileName"></span>
+                </div>
+                <div class="model-scale-row">
+                  <label>
+                    拡大・縮小（倍率）
+                    <input
+                      type="number"
+                      id="modelScale"
+                      min="0.01"
+                      max="100"
+                      step="0.05"
+                      value="1"
+                    />
+                  </label>
+                  <button class="button" id="applyModelScale">
+                    倍率を反映
+                  </button>
+                </div>
+                <p id="modelDimensions" class="dimension-hint"></p>
+                <p class="dimension-hint">
+                  縦・横・高さを同じ倍率で変更します。壁からはみ出す倍率にはできません。
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>窓・ドアの寸法</h2>
+              <span>OPENINGS</span>
+            </div>
+            <div id="openingEmpty" class="selection">
+              間取りの「窓・扉を選ぶ」で、色の付いた壁の部分をクリック
+            </div>
+            <div id="openingEditor" class="selection" hidden>
+              <strong id="openingName"></strong>
+              <div class="dimension-grid">
+                <label>
+                  幅（m）
+                  <input
+                    type="number"
+                    id="openingWidth"
+                    min="0.2"
+                    max="20"
+                    step="0.1"
+                  />
+                </label>
+                <label>
+                  高さ（m）
+                  <input
+                    type="number"
+                    id="openingHeight"
+                    min="0.3"
+                    max="2.95"
+                    step="0.05"
+                  />
+                </label>
+                <label id="sillLabel">
+                  床から窓下まで（m）
+                  <input
+                    type="number"
+                    id="openingSill"
+                    min="0"
+                    max="2.6"
+                    step="0.1"
+                  />
+                </label>
+              </div>
+              <p id="openingLimit" class="dimension-hint"></p>
+              <button class="button" id="applyOpening">寸法を反映</button>
+              <p class="dimension-hint">
+                間取りの選択された位置を中心に幅が変わります。
+              </p>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="section">
+            <div class="section-title">
+              <h2>線画の設定</h2>
+              <span>LINE ART</span>
+            </div>
+            <div class="field">
+              <div class="fieldtop">
+                <span>線の太さ</span>
+                <output id="lineWidthOut">1.0 px</output>
+              </div>
+              <input
+                id="lineWidth"
+                type="range"
+                min="0.5"
+                max="5"
+                step="0.1"
+                value="1"
+              />
+            </div>
+            <div id="binarySettings" hidden>
+              <div class="field">
+                <div class="fieldtop">
+                  <span>奥行きの境目</span>
+                  <output id="depthOut">標準</output>
+                </div>
+                <input
+                  id="depthSensitivity"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="50"
+                />
+                <p class="field-hint">
+                  右へ動かすと、奥行きの変化から線を拾いやすくなります。
+                </p>
+              </div>
+              <div class="field">
+                <div class="fieldtop">
+                  <span>面の向きの境目</span>
+                  <output id="normalOut">標準</output>
+                </div>
+                <input
+                  id="normalSensitivity"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="50"
+                />
+                <p class="field-hint">
+                  右へ動かすと、面の向きの小さな変化も線になります。
+                </p>
+              </div>
+              <label class="check">
+                物体同士の境目を描く
+                <input type="checkbox" id="idEdges" checked />
+              </label>
+            </div>
+            <p class="muted">
+              「二値線画」は奥行き・面の向き・物体の違いから線を抽出します。太さは画素単位で段階的に変わります。CLIP
+              STUDIOのLT変換と同一ではありません。
+            </p>
+          </div>
+          <p class="footer-note">
+            ROOM SKETCH STUDIO · PROTOTYPE
+            <br />
+            ブラウザ内で処理します。
+          </p>
+        </aside>
+      </div>
+      <!-- PNG・クリップボードへの書き出し -->
+      <div class="modal" id="modal">
+        <div class="modal-card">
+          <h2>画像を書き出す</h2>
+          <p>
+            現在の表示をPNG画像として保存、またはクリップボードにコピーします。二値線画は不透明な白黒PNGです。ガイドは含まれません。
+          </p>
+          <button class="button primary" id="download">
+            ↓ PNGをダウンロード
+          </button>
+          <button class="button" id="copy">▢ クリップボードにコピー</button>
+          <button class="button" id="closeModal">閉じる</button>
+        </div>
+      </div>
+      <input type="file" id="modelFile" accept=".glb" hidden />
+      <input
+        type="file"
+        id="projectFile"
+        accept=".json,application/json"
+        hidden
+      />
+      <div class="toast" id="toast"></div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

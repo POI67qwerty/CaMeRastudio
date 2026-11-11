@@ -1,0 +1,11 @@
+/* viewer-navigation — 部屋エディター */
+.viewer-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+@media (max-width: 760px) {
+  .topactions .viewer-link {
+    display: inline-flex;
+  }
+}

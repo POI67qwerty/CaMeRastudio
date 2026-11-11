@@ -1,0 +1,26 @@
+/* notifications — モデルビューアー */
+.error {
+  color: #b75847;
+}
+.toast {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 11px 15px;
+  border-radius: 8px;
+  background: #304a39;
+  color: #fff;
+  font-size: 12px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  z-index: 3;
+  max-width: 90vw;
+}
+.toast.show {
+  opacity: 1;
+}
+[hidden] {
+  display: none !important;
+}

@@ -1,0 +1,28 @@
+/* base — 部屋エディター */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap");
+:root {
+  font-family: "DM Sans", "Noto Sans JP", sans-serif;
+  color: #252d2d;
+  background: #f4f5f2;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}
+button,
+select,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:focus-visible,
+select:focus-visible {
+  outline: 2px solid #7a9a85;
+  outline-offset: 2px;
+}

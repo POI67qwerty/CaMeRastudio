@@ -1,0 +1,14 @@
+/* tatami — 部屋エディター */
+.tatami-settings {
+  margin-top: 11px;
+  padding: 10px;
+  background: #f4f8ef;
+  border: 1px solid #e0ead9;
+  border-radius: 8px;
+}
+.tatami-settings .muted {
+  margin: 7px 0 0;
+}
+#tatamiSettings[hidden] {
+  display: none;
+}
