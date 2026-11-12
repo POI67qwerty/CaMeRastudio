@@ -1,8 +1,2 @@
-# インストールされたパッケージと、ビルド時に自動生成されるファイル
-node_modules/
-dist/
-.vite/
-*.log
-.env
-.env.*
+
 .DS_Store
