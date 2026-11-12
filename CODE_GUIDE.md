@@ -56,6 +56,8 @@ Room Sketch Studioとモデル専用ビューアーのソースを、役割ご�
 | `src/binary-lines.js` | 法線・深度・物体IDを使う、漫画用の二値線画。 |
 | `src/perspective-guides.js` | 消失点・アイレベル・地面グリッドの計算と描画。 |
 | `src/model-io.js` | GLB形式とサイズの検証、Three.jsの `GLTFLoader`、モデルデータの変換。 |
+| `src/shared/camera-controls.js` | 部屋・モデル画面共通のカメラロック、カメラ位置JSONの保存と復元。 |
+| `src/styles/camera-controls.css` | 共通のカメラ保存・読込欄の見た目。 |
 | `src/collision.js` | 回転した長方形の重なりと床外判定。 |
 | `src/tatami.js` | 畳の敷き方と、床に合わせた縁の計算。 |
 | `src/japanese-furniture.js` | 扇風機や和室家具の3D形状。 |

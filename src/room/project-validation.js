@@ -94,6 +94,22 @@ export function validateProject(data) {
       data.camera.fov > 179)
   )
     throw new Error("カメラのデータが不正です。");
+  if (data.camera) {
+    const near = data.camera.near ?? 0.05,
+      far = data.camera.far ?? 200,
+      zoom = data.camera.zoom ?? 1;
+    if (
+      !Number.isFinite(near) ||
+      near < 1e-9 ||
+      !Number.isFinite(far) ||
+      far <= near ||
+      far > 1e12 ||
+      !Number.isFinite(zoom) ||
+      zoom < 0.001 ||
+      zoom > 1000
+    )
+      throw new Error("カメラの表示範囲が不正です。");
+  }
   for (const o of data.objects)
     if (o.type === "model") {
       if (

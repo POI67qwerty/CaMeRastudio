@@ -7,6 +7,7 @@ import { drawPerspectiveGuides } from "./perspective-guides.js";
 import { fitCameraToModel } from "./viewer/model-camera.js";
 import { disposeModel } from "./viewer/model-resources.js";
 import { createPngBlob } from "./viewer/png-export.js";
+import { setupCameraTools, syncCameraFovUI } from "./shared/camera-controls.js";
 
 const $ = (s) => document.querySelector(s);
 
@@ -55,10 +56,20 @@ let objects = [],
   busy = false;
 const binary = new BinaryLineRenderer(renderer),
   controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
+controls.enableDamping = false; // 操作を離した後の慣性をなくす。
 controls.target.set(0, 0, 0);
 camera.position.set(4, 3, 5);
 controls.update();
+const cameraTools = setupCameraTools({
+  camera,
+  controls,
+  toast,
+  lockDisabled: ["#resetView", "#frontView", "#fov"].map($),
+  onCameraLoaded: () => {
+    syncCameraFovUI(camera);
+    guideCache = "";
+  },
+});
 let toastTimer;
 function toast(text, isError = false) {
   const el = $("#toast");
@@ -153,8 +164,12 @@ async function loadFile(file) {
     $("#filename").title = file.name;
     $("#empty").hidden = true;
     applyCulling();
-    fitModel();
-    toast("モデルを読み込みました");
+    if (!cameraTools.isLocked()) fitModel();
+    toast(
+      cameraTools.isLocked()
+        ? "モデルを読み込みました。カメラはロック中です"
+        : "モデルを読み込みました",
+    );
   } catch (err) {
     console.error(err);
     toast(err.message || "モデルを読み込めませんでした", true);

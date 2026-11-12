@@ -1,0 +1,23 @@
+/* 部屋エディターとモデルビューアーに共通するカメラ保存・ロック欄。 */
+.camera-tools {
+  margin-top: 9px;
+}
+.camera-tools-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px;
+}
+.camera-tools-actions button {
+  min-width: 0;
+  white-space: nowrap;
+}
+.camera-tools-hint {
+  margin: 7px 0 0;
+  color: #8d9c90;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.camera-tools-actions button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}

@@ -32,6 +32,12 @@ import { serializeProjectObjects } from "./room/project-serialization.js";
 import { templateItems } from "./room/templates.js";
 import { bindGuideControls } from "./room/guide-controls.js";
 import { bindImageExport } from "./room/image-export.js";
+import {
+  setupCameraTools,
+  syncCameraFovUI,
+  validateCameraSnapshot,
+  applyCameraSnapshot,
+} from "./shared/camera-controls.js";
 
 const $ = (s) => document.querySelector(s);
 
@@ -56,11 +62,20 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 const binaryRenderer = new BinaryLineRenderer(renderer);
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0, 1, 0);
-controls.enableDamping = true;
+controls.enableDamping = false; // 操作を離した後の慣性をなくす。
 controls.maxPolarAngle = Math.PI * 0.49;
 controls.minDistance = 1;
 controls.maxDistance = 40;
 controls.update();
+const cameraTools = setupCameraTools({
+  camera,
+  controls,
+  toast,
+  lockDisabled: ["#camera", "#resetCamera", "#zoomIn", "#zoomOut", "#fov"].map(
+    $,
+  ),
+  onCameraLoaded: () => syncCameraFovUI(camera),
+});
 scene.add(new THREE.HemisphereLight(0xffffff, 0x9ca896, 2.2));
 const sun = new THREE.DirectionalLight(0xffffff, 2);
 sun.position.set(5, 10, 7);
@@ -905,7 +920,7 @@ canvas.addEventListener(
     e.stopImmediatePropagation();
     select(g);
     remember();
-    controls.enabled = false;
+    cameraTools.setInteractionBlocked(true);
     drag3D = {
       g,
       offsetX: g.position.x - p.x,
@@ -936,7 +951,7 @@ function stopDrag3D(e) {
   if (!drag3D || drag3D.pointer !== e.pointerId) return;
   e.stopImmediatePropagation();
   drag3D = null;
-  controls.enabled = true;
+  cameraTools.setInteractionBlocked(false);
 }
 canvas.addEventListener("pointerup", stopDrag3D, true);
 canvas.addEventListener("pointercancel", stopDrag3D, true);
@@ -1456,6 +1471,9 @@ function projectData() {
       position: camera.position.toArray(),
       target: controls.target.toArray(),
       fov: camera.fov,
+      near: camera.near,
+      far: camera.far,
+      zoom: camera.zoom,
     },
   };
 }
@@ -1549,14 +1567,34 @@ function restoreView(data) {
       $("#lineWidth").dispatchEvent(new Event("input"));
     }
   }
-  if (data.camera) {
-    camera.position.fromArray(data.camera.position);
-    controls.target.fromArray(data.camera.target);
-    camera.fov = data.camera.fov;
-    camera.updateProjectionMatrix();
-    controls.update();
-    $("#fov").value = camera.fov;
-    $("#fovOut").textContent = camera.fov + "°";
+  if (data.camera && !cameraTools.isLocked()) {
+    const storedCamera = {
+      ...data.camera,
+      type: "room-sketch-camera",
+      version: 1,
+      near: data.camera.near ?? 0.05,
+      far: data.camera.far ?? 200,
+      zoom: data.camera.zoom ?? 1,
+    };
+    try {
+      // 操作可能範囲も必要に応じて広げ、保存した視点が変わらないようにする。
+      applyCameraSnapshot(
+        camera,
+        controls,
+        validateCameraSnapshot(storedCamera),
+      );
+    } catch {
+      // 旧形式で注視点と位置が同じなど、従来受け付けていた値も読み込めるようにする。
+      camera.position.fromArray(data.camera.position);
+      controls.target.fromArray(data.camera.target);
+      camera.fov = storedCamera.fov;
+      camera.near = storedCamera.near;
+      camera.far = storedCamera.far;
+      camera.zoom = storedCamera.zoom;
+      camera.updateProjectionMatrix();
+      controls.update();
+    }
+    syncCameraFovUI(camera);
   }
 }
 $("#projectFile").onchange = async (e) => {
@@ -1635,10 +1673,13 @@ $("#projectFile").onchange = async (e) => {
     select(null);
     restoreView(data);
     beforeLoad = null;
+    const message = adjusted
+      ? `読み込みました。${adjusted}個の物を床の内側へ調整しました`
+      : "モデルを含むプロジェクトを読み込みました";
     toast(
-      adjusted
-        ? `読み込みました。${adjusted}個の物を床の内側へ調整しました`
-        : "モデルを含むプロジェクトを読み込みました",
+      cameraTools.isLocked() && data.camera
+        ? `${message}。カメラはロック中のため変更していません`
+        : message,
     );
   } catch (err) {
     if (beforeLoad) {

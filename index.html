@@ -350,6 +350,26 @@
               </div>
               <input id="fov" type="range" min="20" max="90" value="45" />
             </div>
+            <!-- カメラ位置だけを固定・保存・読み込み -->
+            <label class="check">
+              カメラをロック
+              <input id="cameraLock" type="checkbox" />
+            </label>
+            <div class="camera-tools">
+              <div class="camera-tools-actions">
+                <button class="button" id="cameraSave">カメラを保存</button>
+                <button class="button" id="cameraLoad">カメラを読込</button>
+              </div>
+              <input
+                id="cameraFile"
+                type="file"
+                accept=".json,application/json"
+                hidden
+              />
+              <p class="camera-tools-hint">
+                位置・向き・画角をJSONに保存します。読込はロック解除後にできます。
+              </p>
+            </div>
             <label class="check">
               手前の壁を隠す
               <input type="checkbox" id="hideWalls" checked />
